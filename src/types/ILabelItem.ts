@@ -1,10 +1,10 @@
 export interface ILabelItem {
-    id: number
+    id: number | string
     content: string
 }
 
 export class LabelItem implements ILabelItem {
-    id: number;
+    id: number | string;
     content: string;
 
     constructor(model?: ILabelItem) {

@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { makeStyles, createStyles, Theme } from "@material-ui/core/styles";
-import { orange, red, amber } from "@material-ui/core/colors";
 import Box from "@material-ui/core/Box";
 import Card from '@material-ui/core/Card';
 import Checkbox from "@material-ui/core/Checkbox";
@@ -8,18 +7,46 @@ import CardActionArea from '@material-ui/core/CardActionArea';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import GridList from '@material-ui/core/GridList';
+import { connect } from "react-redux";
+import { Dispatch } from 'redux';
 
 import Label from "../label";
 import CustomIcon from "../icons";
-import { ITaskItem } from "../../models/TaskModel";
+import { ITodoItem } from "../../types/ITodoItem";
+import { getLevelColor, formatDate } from "../../utils";
+import * as actions from "../../store/actions";
 
 
-interface Props {
-  item: ITaskItem
-
-  onClick?: Function
-  onChecked?: Function
+interface IProps {
+  item: ITodoItem
+  onClick?: (item: ITodoItem) => void;
+  showDetails?: boolean;
 }
+
+interface IState {
+  item: ITodoItem
+}
+
+interface IDispatcherProps {
+  toggleTodo: () => void;
+  deleteTodo: () => void;
+}
+
+const mapStateToProps = (state: IState, ownProps: IProps): IProps => ({
+  item: ownProps.item,
+  onClick: ownProps.onClick,
+  showDetails: ownProps.showDetails
+})
+
+// 将对应的 action 插入到组件的 props 中
+const mapDispatherToProps = (dispatch: Dispatch, ownProps: IProps): IDispatcherProps => ({
+  deleteTodo: () => dispatch(actions.delteTodo(ownProps.item.id)),
+  toggleTodo: () => dispatch(actions.toggleTodo(ownProps.item.id))
+})
+
+
+export type ReduxType = ReturnType<typeof mapStateToProps> & ReturnType<typeof mapDispatherToProps>;
+
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -49,92 +76,82 @@ const useStyles = makeStyles((theme: Theme) =>
       verticalAlign: "middle"
     },
 
-    orange: {
-      color: orange[500]
-    },
-
-    red: {
-      color: red[500]
-    },
-
-    amber: {
-      color: amber[500]
-    },
-
     marginRight: {
       marginRight: "10px"
     }
   }),
 );
 
-export default function TaskItem(props: Props) {
-  const classes = useStyles();
-  const item = props.item;
-  const labels = item.labels || [];
-  const checked = item.isFinish ? true : false;
 
-  // checkbox的颜色
-  let color;
-  if (item.isFinish) {
-    color = void 0;
-  } else {
-    switch (item.level) {
-      case "highest":
-        color = classes.red;
-        break;
-      case "important":
-        color = classes.orange;
-        break;
-      case "advanced":
-        color = classes.amber;
-        break;
-      default:
-        color = void 0;
-        break;
-    }
-  }
+export default connect(mapStateToProps, mapDispatherToProps)(function TaskItem(props: ReduxType) {
+  const classes = useStyles();
+  const labels = props.item.labels || [];
+  const checked = props.item.isFinish ? true : false;
+  const [showDetails, setShowDetails] = React.useState(props.showDetails === void 0 ? true : props.showDetails);
+
+  useEffect(() => {
+    setShowDetails(props.showDetails === void 0 ? true : props.showDetails);
+  }, [props.showDetails])
 
   const handleClick = (event: any) => {
     event.stopPropagation();
-    props.onClick && !props.item.isFinish ? props.onClick(item) : void 0;
+    if (!props.item.isFinish) {
+      if (props.onClick) {
+        props.onClick(props.item);
+      }
+    }
   }
 
-  const handleChangeCheckbox = item.isFinish ? void 0 : (event: React.ChangeEvent<HTMLInputElement>) => {
-    event.stopPropagation();
-    props.onChecked ? props.onChecked(event.target.checked, item) : void 0
+  const handleChangeCheckbox = (e: any) => {
+    e.stopPropagation();
+    if (!props.item.isFinish) {
+      props.toggleTodo();
+    }
   }
 
   return (
-    <Box mb={0.5}>
+    <Box my={0.5}>
       <Card>
         <CardActionArea onClick={handleClick}>
           <CardContent className={classes.root}>
             <div className={classes.fullWidth}>
-              <Checkbox className={color} color="default" checked={checked} onChange={handleChangeCheckbox} />
+
+              {/* 给CheckBox套上一层span，防止事件冒泡 */}
+              <span onClick={e => { e.stopPropagation(); }}>
+                <Checkbox className={getLevelColor(props.item)} color="default" checked={checked} onChange={(e) => handleChangeCheckbox(e)} />
+              </span>
               <span className={classes.title}>
-                {item.title}
+                {props.item.title}
               </span>
             </div>
 
-            <GridList className={`${classes.hidden} ${classes.fullWidth}`} style={{ margin: "0 0 5px 20px" }}>
-              {labels.map(item => (
-                <Label key={item.id} className={classes.marginRight} name={item.content} />
-              ))}
-            </GridList>
-            <div className={`${classes.hidden} ${classes.fullWidth}`} style={{ marginLeft: "20px" }}>
-              <Box mr={2} style={{ minWidth: "60px" }}>
-                <Typography variant="body2" color="textSecondary" component="p" noWrap={true}>
-                  {item.date}
-                </Typography>
-              </Box>
-              <span style={{ alignSelf: "flex-end" }} className={`${classes.hidden}`}>
-                {item.hasAlarm ? <CustomIcon name="alarm" size={16} className={classes.marginRight} /> : null}
-                {item.hasCyclic ? <CustomIcon name="cyclic" size={16} className={classes.marginRight} /> : null}
-              </span>
-            </div>
+            {
+              showDetails
+                ? <GridList className={`${classes.hidden} ${classes.fullWidth}`} style={{ margin: "0 0 5px 20px" }}>
+                  {labels.map(item => (
+                    <Label key={item.id} className={classes.marginRight} name={item.content} />
+                  ))}
+                </GridList>
+                : null
+            }
+            {
+              showDetails
+                ? <div className={`${classes.hidden} ${classes.fullWidth}`} style={{ marginLeft: "20px" }}>
+                  <Box mr={2} style={{ minWidth: "60px" }}>
+                    <Typography variant="body2" color="textSecondary" component="p" noWrap={true}>
+                      {formatDate(props.item.date)}
+                    </Typography>
+                  </Box>
+                  <span style={{ alignSelf: "flex-end" }} className={`${classes.hidden}`}>
+                    {props.item.hasAlarm ? <CustomIcon name="alarm" size={16} className={classes.marginRight} /> : null}
+                    {props.item.hasCyclic ? <CustomIcon name="cyclic" size={16} className={classes.marginRight} /> : null}
+                  </span>
+                </div>
+                : null
+            }
           </CardContent>
         </CardActionArea>
       </Card>
     </Box>
   );
-}
+})

@@ -1,80 +1,65 @@
 import React from 'react';
-import Box from "@material-ui/core/Box";
+import { makeStyles, createStyles, Theme } from '@material-ui/core/styles';
+import BottomNavigation from '@material-ui/core/BottomNavigation';
+import BottomNavigationAction from '@material-ui/core/BottomNavigationAction';
+import DoneIcon from '@material-ui/icons/Done';
+import DateRangeIcon from '@material-ui/icons/DateRange';
+import SettingsIcon from '@material-ui/icons/Settings';
+import { BrowserRouter as Router, Switch, Link } from "react-router-dom";
 
-import TaskItem from "./components/taskItem";
-import { ITaskItem } from './models/TaskModel';
+import Footer from "./layouts/footer";
 
-
-const tasks = [
-  {
-    id: 1,
-    title: "任务1",
-    labels: [{id: 1, content: "资金"}, {id: 2, content: "每月固定任务"}],
-    level: "highest",
-    date: (new Date()).toString(),
-    isFinish: false,
-    hasAlarm: true,
-    hasCyclic: false,
-  },
-  {
-    id: 2,
-    title: "任务2",
-    labels: [{id: 1, content: "资金"}, {id: 2, content: "每月固定任务"}],
-    level: "important",
-    date: (new Date()).toISOString(),
-    isFinish: false,
-    hasAlarm: true,
-    hasCyclic: false
-  },
-  {
-    id: 3,
-    title: "任务3",
-    labels: [{id: 1, content: "资金"}, {id: 2, content: "每月固定任务"}],
-    level: "advanced",
-    date: (new Date()).toISOString(),
-    isFinish: true,
-    hasAlarm: true,
-    hasCyclic: true
-  }
-]
+import routes from "./router";
+import { RouteWithSubRoutes } from "./assets/common";
+import { IRoute } from "./types/IRoute";
 
 
-class App extends React.Component {
-  /**
-   *
-   */
-  constructor(props: any) {
-    super(props);
+const useStyles = makeStyles((theme: Theme) =>
+  createStyles({
+    root: {
+      width: "100%",
+      height: "100%",
+      backgroundColor: theme.palette.info.dark
+    }
+  })
+);
 
-    this.state = { tasks: tasks }
-  }
 
-  handleChecked = (f: boolean, item: ITaskItem) => {
-    const id = item.id;
-    for (let i = 0; i < tasks.length; i++) {
-      const element = tasks[i];
-      if (element.id === id) {
-        element.isFinish = true;
+export default function App(props: any) {
+  const classes = useStyles();
+  const [route, setRoute] = React.useState("todos");
+
+  const handleChangeRoute = (event: React.ChangeEvent<{}>, newValue: string) => {
+    let name;
+    switch (newValue) {
+      case "calendar":
+        name = "calendar";
         break;
-      }
+      case "settings":
+        name = "settings";
+        break;
+      default:
+        name = "todos";
+        break;
     }
 
-    this.setState({tasks: tasks})
-  }
+    setRoute(name);
+  };
 
-  handleClick = () => {
-    console.log("点击");
-  }
-
-  render() {
-    return (
-      <Box m={1}>
-        { tasks.map(item => (
-          <TaskItem key={item.id} item={item} onChecked={this.handleChecked} onClick={this.handleClick}></TaskItem>
-        ))}
-      </Box>
-    )
-  }
+  return (
+    <Router>
+      <Switch>
+        {routes.map((route: IRoute, i: number) => {
+          return RouteWithSubRoutes(route, i);
+        })}
+      </Switch>
+      <Footer>
+        <BottomNavigation value={route} onChange={handleChangeRoute} className={classes.root}>
+          <BottomNavigationAction component={Link} to="/todos" style={{ color: "white", maxHeight: "60px" }} label="清单" value="todos" icon={<DoneIcon />} />
+          <BottomNavigationAction component={Link} to="/calendar" style={{ color: "white", maxHeight: "60px" }} label="日历" value="calendar" icon={<DateRangeIcon />} />
+          <BottomNavigationAction component={Link} to="/settings" style={{ color: "white", maxHeight: "60px" }} label="设置" value="settings" icon={<SettingsIcon />} />
+        </BottomNavigation>
+      </Footer>
+    </Router>
+  )
 }
-
-export default App;

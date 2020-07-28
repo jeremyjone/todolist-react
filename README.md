@@ -1,68 +1,28 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# Todolist By React
 
-## Available Scripts
+初学React，断断续续写了一个快写烂的todolist，功能好写，追求了一些样式，结合Material-UI写的。
 
-In the project directory, you can run:
+仿滴答清单样式和功能，简单实现了一下。认为具有学习价值的功能已经实现，其他就是一些堆叠代码的功能，没有做。
 
-### `yarn start`
+## 截图
 
-Runs the app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+![home](./pic/home.png)
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
+![drawer](./pic/drawer.png)
 
-### `yarn test`
+![calendar](./pic/calendar.png)
 
-Launches the test runner in the interactive watch mode.<br />
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+![modify](./pic/modify.png)
 
-### `yarn build`
+![settime](./pic/settime.png)
 
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 学习
 
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
+仅做初学之用。
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
-
-### Analyzing the Bundle Size
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
-
-### Making a Progressive Web App
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
-
-### Advanced Configuration
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `yarn build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+[x] 函数式组件的概念。*之前用class写的组件，后面全部推倒重新用函数式写了一遍。*
+[x] 使用钩子
+[x] 使用第三方组件库
+[x] 使用router
+[x] 使用redux
+[x] 使用TypeScript，之前很少使用
